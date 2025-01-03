@@ -1,0 +1,2 @@
+FLASK_APP=my_bubble.py
+FLASK_DEBUG=1

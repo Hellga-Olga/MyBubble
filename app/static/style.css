@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Modak&display=swap');
+
+html, body {
+    margin: 0 0 0 0;
+    height: 100%;
+    width: 100%;
+}
+
+.logo, .links {
+    text-decoration: none;
+}
+
+.navbar {
+    background-color: #f2f7ff;
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    justify-content: space-evenly;
+    padding-left: 20px;
+}
+
+.nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    height: 70px;
+    align-items: center;
+}
+
+.nav .links {
+    font-family: 'Roboto', sans-serif;
+    font-size: large;
+    color: #154314;
+}
+
+.logo {
+    font-family: "Modak", serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 55px;
+    line-height: 70px;
+    color: #6e2747;
+    text-shadow: 10px 10px 10px #fff;
+}
+
+.main-container {
+    padding: 20px 50px;
+    height: 83%;
+}
+
+.boards {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+.links > img {
+    width: 200px;
+    height: 200px;
+}
+
+.one {
+    background-color: red;
+}
+
+.two {
+    background-color: blue;
+}
+
+.three {
+    background-color: green;
+}
+
+.four {
+    background-color: yellow;
+}
+
+.five {
+    background-color: orange;
+}
+
+footer {
+display: flex;
+flex-direction: row;
+justify-content: space-around;
+flex-wrap: wrap;
+background: #593b61;
+}

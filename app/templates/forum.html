@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if current_user.is_authenticated %}
+        <h1>{{ _('Hi, %(username)s!', username=current_user.username) }}</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.post.label }}<br>
+            {{ form.post(cols=32, rows=4) }}<br>
+            {% for error in form.post.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+    {% else %}
+        <h1>{{ _('Hi, anonymous!') }}</h1>
+        <h3>{{ _('If you want to post something or reply, please') }}
+            <a class="links" aria-current="page" href="{{ url_for('auth.login') }}">{{ _('log in') }}</a>
+        </h3>
+    {% endif %}
+    <h2>{{ _('Forum Feed') }}</h2>
+    {% for post in posts %}
+        {% include '_post.html' %}
+    {% endfor %}
+{% endblock %}

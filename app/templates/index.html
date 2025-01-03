@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<header>
+    <div id="header-container">
+    </div>
+  </header>
+    <div class="grid-container">
+        <div class="container_welcome">
+            {% if current_user.is_authenticated %}
+                <div class="welcome_text">{{ _('Hello, %(username)s', username=current_user.username.capitalize()) }}!</div>
+            {% else %}
+                <div class="welcome_text">{{ _('Hello') }}!</div>
+            {% endif %}
+            <h2>{{ _('Choose your boards') }}</h2>
+        </div>
+        <section class="boards">
+            <div class="board one"><a class="links" aria-current="page" href="{{ url_for('auth.login') }}"><img src="{{ url_for('static', filename='conversation-svgrepo-com.svg')}}"><p>{{ _('Casual') }}</p></a></div>
+            <div class="board two"><a class="links" aria-current="page" href="{{ url_for('auth.login') }}"><img src="{{ url_for('static', filename='cinema-svgrepo-com.svg')}}"><p>{{ _('Movies') }}</p></a></div>
+            <div class="board three"><a class="links" aria-current="page" href="{{ url_for('auth.login') }}"><img src="{{ url_for('static', filename='music-svgrepo-com.svg')}}"><p>{{ _('Music') }}</p></a></div>
+            <div class="board four"><a class="links" aria-current="page" href="{{ url_for('auth.login') }}"><img src="{{ url_for('static', filename='arcade-svgrepo-com.svg')}}"><p>{{ _('Video Games') }}</p></a></div>
+            <div class="board five"><a class="links" aria-current="page" href="{{ url_for('auth.login') }}"><img src="{{ url_for('static', filename='books-study-svgrepo-com.svg')}}"><p>{{ _('Books') }}</p></a></div>
+        </section>
+    </div>
+
+<br>
+    <h2>{{ _('Latest on the forum') }}</h2>
+    {% for post in posts %}
+        {% include '_post.html' %}
+    {% endfor %}
+    {% if prev_url %}
+    <a href="{{ prev_url }}">{{ _('Newer posts') }}</a>
+    {% endif %}
+    {% if next_url %}
+    <a href="{{ next_url }}">{{ _('Older posts') }}</a>
+    {% endif %}
+    </div>
+{% endblock %}

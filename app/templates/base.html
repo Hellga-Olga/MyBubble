@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if title %}
+    <title>{{ title }} - MyBubble</title>
+    {% else %}
+    <title>{{ _('Welcome to MyBubble') }}</title>
+    {% endif %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='view.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <a class="logo" href="{{ url_for('main.index') }}">MyBubble</a>
+        <nav class="nav">
+            <a class="links" aria-current="page" href="{{ url_for('main.index') }}">{{ _('Home') }}</a>
+            <a class="links" aria-current="page" href="{{ url_for('main.forum') }}">{{ _('Forum') }}</a>
+            {% if current_user.is_authenticated %}
+                <a class="links" aria-current="page" href="{{ url_for('main.messages') }}">{{ _('Messages') }}
+                    {% set unread_message_count = current_user.unread_message_count() %}
+                    <span id="message_count" class="badge text-bg-danger"
+                        style="visibility: {% if unread_message_count %}visible
+                                     {% else %}hidden {% endif %};">
+                        {{ unread_message_count }}
+                    </span>
+                </a>
+                <a class="links" aria-current="page" href="{{ url_for('main.user', username=current_user.username) }}">{{ _('Your Page') }}</a>
+            {% endif %}
+            {% if current_user.is_anonymous %}
+            <a class="links" aria-current="page" href="{{ url_for('auth.login') }}">{{ _('Login') }}</a>
+            {% else %}
+            <a class="links" aria-current="page" href="{{ url_for('auth.logout') }}">{{ _('Logout') }}</a>
+            {% endif %}
+        </nav>
+    </div>
+
+    <div class="main-container">
+        {% if current_user.is_authenticated %}
+
+        {% endif %}
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-info" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+    <footer>
+      <div class="footer-container">
+        <p>&copy; 2025 MyBubble by Olga Neiasova</p>
+      </div>
+    </footer>
+
+{% block scripts %}
+    {{ moment.include_moment() }}
+    {{ moment.lang(g.locale) }}
+    <script>
+      async function translate(sourceElem, destElem, sourceLang, destLang) {
+        document.getElementById(destElem).innerHTML =
+          '<img src="{{ url_for('static', filename='loading.gif') }}">';
+        const response = await fetch('/translate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json; charset=utf-8'},
+          body: JSON.stringify({
+            text: document.getElementById(sourceElem).innerText,
+            source_language: sourceLang,
+            dest_language: destLang
+          })
+        })
+        const data = await response.json();
+        document.getElementById(destElem).innerText = data.text;
+      }
+
+      function initialize_popovers() {
+        const popups = document.getElementsByClassName('user_popup');
+        for (let i = 0; i < popups.length; i++) {
+          const popover = new bootstrap.Popover(popups[i], {
+            content: 'Loading...',
+            trigger: 'hover focus',
+            placement: 'right',
+            html: true,
+            sanitize: false,
+            delay: {show: 500, hide: 0},
+            container: popups[i],
+            customClass: 'd-inline',
+          });
+          popups[i].addEventListener('show.bs.popover', async (ev) => {
+            if (ev.target.popupLoaded) {
+              return;
+            }
+            const response = await fetch('/user/' + ev.target.innerText.trim() + '/popup');
+            const data = await response.text();
+            const popover = bootstrap.Popover.getInstance(ev.target);
+            if (popover && data) {
+              ev.target.popupLoaded = true;
+              popover.setContent({'.popover-body': data});
+              flask_moment_render_all();
+            }
+          });
+        }
+      }
+      document.addEventListener('DOMContentLoaded', initialize_popovers);
+
+      function set_message_count(n) {
+        const count = document.getElementById('message_count');
+        count.innerText = n;
+        count.style.visibility = n ? 'visible' : 'hidden';
+      }
+
+      function set_task_progress(task_id, progress) {
+        const progressElement = document.getElementById(task_id + '-progress');
+        if (progressElement) {
+          progressElement.innerText = progress;
+        }
+      }
+
+      {% if current_user.is_authenticated %}
+      function initialize_notifications() {
+        let since = 0;
+        setInterval(async function() {
+          const response = await fetch('{{ url_for('main.notifications') }}?since=' + since);
+          const notifications = await response.json();
+          for (let i = 0; i < notifications.length; i++) {
+            switch (notifications[i].name) {
+              case 'unread_message_count':
+                set_message_count(notifications[i].data);
+                break;
+              case 'task_progress':
+                set_task_progress(notifications[i].data.task_id,
+                    notifications[i].data.progress);
+                break;
+            }
+            since = notifications[i].timestamp;
+          }
+        }, 10000);
+      }
+      document.addEventListener('DOMContentLoaded', initialize_notifications);
+      {% endif %}
+    </script>
+{% endblock %}
+{{ moment.lang(g.locale) }}
+</body>
+</html>
