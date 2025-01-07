@@ -2,7 +2,7 @@ from app import db, login
 from datetime import datetime, timezone
 from typing import Optional
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import current_app
+from flask import current_app, url_for
 from flask_login import UserMixin
 from hashlib import md5
 from time import time
@@ -59,6 +59,10 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def avatar(self, size):
+        user_id = self.id
+        avatar_img = Avatar.query.filter_by(user_id=user_id).first()
+        if avatar_img:
+            return url_for('static', filename=avatar_img.thumbnail_path)
         digest = md5(self.email.lower().encode('utf-8')).hexdigest() # encodes the email string as bytes before passing it on to the hash function
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
 
@@ -130,12 +134,20 @@ class Post(db.Model):
     body: so.Mapped[str] = so.mapped_column(sa.String(140))
     timestamp: so.Mapped[datetime] = so.mapped_column(index=True, default=lambda: datetime.now(timezone.utc)) # index is useful for retrieving posts in chronological order
     user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id), index=True) # the use of a foreign key "user_id" on the "many" side "post"
-    author: so.Mapped[User] = so.relationship(back_populates='posts')
     language: so.Mapped[Optional[str]] = so.mapped_column(sa.String(5))
+    parent_post: so.Mapped[Optional[int]] = so.mapped_column(sa.ForeignKey('post.id', name='fk_parent_post'), index=True)
+    board_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey('board.id', name='fk_board_id'), nullable=False)
+
+    author: so.Mapped[User] = so.relationship(back_populates='posts')
+    board: so.Mapped['Board'] = so.relationship('Board', back_populates="posts")
+    images: so.Mapped[list['Image']] = so.relationship(back_populates='post', cascade='all, delete-orphan')
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)
 
+    def parent(self, id): # method which returns a parent post object
+        parent_post = db.first_or_404(sa.select(Post).where(Post.id == id))
+        return parent_post
 
 class Message(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
@@ -169,3 +181,36 @@ class Notification(db.Model):
 
     def get_data(self):
         return json.loads(str(self.payload_json))
+
+
+class Image(db.Model):
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    post_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Post.id), index=True)
+    thumbnail_path: so.Mapped[str] = so.mapped_column(sa.String(50))
+    original_path: so.Mapped[str] = so.mapped_column(sa.String(50))
+    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id), index=True)
+    post: so.Mapped['Post'] = so.relationship(back_populates='images')
+    timestamp: so.Mapped[datetime] = so.mapped_column(index=True, default=lambda: datetime.now(timezone.utc))
+
+    def __repr__(self):
+        return '<Image {}>'.format(self.id)
+
+
+class Avatar(db.Model):
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    thumbnail_path: so.Mapped[str] = so.mapped_column(sa.String(50))
+    original_path: so.Mapped[str] = so.mapped_column(sa.String(50))
+    user_id: so.Mapped[int] = so.mapped_column(db.ForeignKey(User.id))
+    timestamp: so.Mapped[datetime] = so.mapped_column(index=True, default=lambda: datetime.now(timezone.utc))
+
+    def __repr__(self):
+        return '<Avatar {}>'.format(self.name)
+
+
+class Board(db.Model):
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    name: so.Mapped[str] = so.mapped_column(sa.String(50), unique=True, nullable=False)
+    posts: so.Mapped[list['Post']] = so.relationship('Post', back_populates="board", lazy="dynamic")
+
+    def __repr__(self):
+        return 'Board {}'.format(self.name)

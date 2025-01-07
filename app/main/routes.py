@@ -2,13 +2,19 @@ from datetime import datetime, timezone
 from flask import render_template, flash, redirect, url_for, request, g, current_app
 from flask_login import current_user, login_required
 from flask_babel import _, get_locale
+from werkzeug.utils import secure_filename
 import sqlalchemy as sa
 from langdetect import detect, LangDetectException
+from PIL import Image as Image_pil
+from upload import validate_image, file_exist
 from app import db
-from app.main.forms import EditProfileForm, EmptyForm, PostForm, MessageForm
-from app.models import User, Post, Message, Notification
+from app.main.forms import EditProfileForm, EmptyForm, PostForm, MessageForm, AvatarUploadForm
+from app.models import User, Post, Message, Notification, Image, Board, Avatar
 from app.translate import translate
 from app.main import bp
+from sqlalchemy.orm import joinedload
+import os
+import uuid
 
 
 @bp.before_request
@@ -23,7 +29,8 @@ def before_request(): # executed right before the view function
 @bp.route('/index', methods=['GET', 'POST'])  #decorator creates an association between the URL given as an argument and the function
 def index():
     page = request.args.get('page', 1, type=int)
-    query = sa.select(Post).order_by(Post.timestamp.desc())
+    # query = sa.select(Post).order_by(Post.timestamp.desc())
+    query = sa.select(Post).options(joinedload(Post.images)).order_by(Post.timestamp.desc())
     posts = db.paginate(query, page=page,
                         per_page=current_app.config['POSTS_PER_PAGE'], error_out=False)
     next_url = url_for('main.index', page=posts.next_num) \
@@ -34,27 +41,49 @@ def index():
                            prev_url=prev_url) #converts a template into a complete HTML page
 
 
-@bp.route('/forum', methods=['GET', 'POST'])
-def forum():
+@bp.route('/board/<string:board_name>', methods=['GET', 'POST'])
+def board_posts(board_name):
     form = PostForm()
+    board = Board.query.filter_by(name=board_name).first_or_404()
     if form.validate_on_submit():
         try:
             language = detect(form.post.data)
         except LangDetectException:
             language = ''
-        post = Post(body=form.post.data, author=current_user, language=language)
+        post = Post(body=form.post.data, author=current_user, board=board, language=language)
         db.session.add(post)
+        db.session.flush()
+        if form.image.data:
+            for file in form.image.data:
+                if file_exist(file.stream) == 'Ok':
+                    given_filename = secure_filename(
+                        file.filename)  # ensures the uploaded file's name is safe for the system
+                    file_ext = os.path.splitext(given_filename)[1]  # takes the file's extension
+                    if file_ext == '':
+                        file_ext = '.' + os.path.splitext(given_filename)[0]
+                    filename = str(uuid.uuid4())  # assigns a unique name for a file
+                    orig_path = os.path.join(current_app.config['UPLOAD_PATH'], f'{filename}{file_ext}')
+                    file.save(orig_path)
+                    db_orig_path = f'{current_app.config['STATIC_PATH']}{filename}{file_ext}'  # static path to write in database
+                    file_variants = save_image_variants(file, current_app.config['UPLOAD_PATH'], current_app.config['STATIC_PATH'], filename, file_ext)
+                    image = Image(post=post, thumbnail_path=file_variants['thumbnail'],
+                                  original_path=db_orig_path, user_id=current_user.id)  # automatically sets post_id
+                    db.session.add(image)
         db.session.commit()
-        flash(_('Your post is published!'))
-        return redirect(url_for('main.forum'))
+        if form.image.data == [] and form.post.data == '':
+            return redirect(url_for('main.board_posts', board_name=board_name))
+        flash(_('Your reply is published!'))
+        return redirect(url_for('main.board_posts', board_name=board_name))
+
     page = request.args.get('page', 1, type=int)
-    query = sa.select(Post).order_by(Post.timestamp.desc())
-    posts = db.paginate(query, page=page, per_page=current_app.config['POSTS_PER_PAGE'], error_out=False) # Pagination object
-    next_url = url_for('main.forum', page=posts.next_num) \
+    query = board.posts.order_by(Post.timestamp.desc())
+    posts = db.paginate(query, page=page, per_page=current_app.config['POSTS_PER_PAGE'],
+                        error_out=False)  # Pagination object
+    next_url = url_for('main.board_posts', board_name=board_name, page=posts.next_num) \
         if posts.has_next else None
-    prev_url = url_for('main.forum', page=posts.prev_num) \
+    prev_url = url_for('main.board_posts', board_name=board_name, page=posts.prev_num) \
         if posts.has_prev else None
-    return render_template("forum.html", title=_('Forum Page'), form=form, posts=posts.items,
+    return render_template('board_posts.html', title= board_name, board=board, form=form, posts=posts.items,
                            next_url=next_url, prev_url=prev_url)
 
 
@@ -135,7 +164,6 @@ def unfollow(username):
 
 
 @bp.route('/translate', methods=['POST'])
-@login_required
 # returns a dictionary with data that the client has submitted in JSON format
 def translate_text():
     data = request.get_json()
@@ -191,3 +219,94 @@ def notifications():
         'data': n.get_data(),
         'timestamp': n.timestamp
     } for n in notifications]
+
+
+def save_image_variants(uploaded_image, output_dir, static_path, filename, extension):
+    sizes = {
+        'thumbnail': (150, 150), # size for thumbnail
+    }
+
+    image = Image_pil.open(uploaded_image)
+    variants = {}
+    for size_name, dimensions in sizes.items():
+        path = os.path.join(output_dir, f"{filename}_{size_name}{extension}")
+        image_copy = image.copy()
+        image_copy.thumbnail(dimensions)
+        image_copy.save(path)
+        variant_path = f'{static_path}{filename}_{size_name}{extension}'
+        variants[size_name] = variant_path
+    return variants
+
+
+@bp.route('/reply/<board_id>/<post_id>/<post_author>', methods=['GET', 'POST'])
+@login_required
+def reply(board_id, post_id, post_author):
+    form = PostForm()
+    if form.validate_on_submit():
+        try:
+            language = detect(form.post.data)
+        except LangDetectException:
+            language = ''
+        post = Post(body=form.post.data, author=current_user, parent_post=post_id, board_id=board_id, language=language)
+        db.session.add(post)
+        db.session.flush()
+        if form.image.data:
+            for file in form.image.data:
+                if file_exist(file.stream) == 'Ok':
+                    given_filename = secure_filename(file.filename) # ensures the uploaded file's name is safe for the system
+                    file_ext = os.path.splitext(given_filename)[1] # takes the file's extension
+                    if file_ext == '':
+                        file_ext = '.' + os.path.splitext(given_filename)[0]
+                    filename = str(uuid.uuid4()) # assigns a unique name for a file
+                    orig_path = os.path.join(current_app.config['UPLOAD_PATH'], f'{filename}{file_ext}')
+                    file.save(orig_path)
+                    db_orig_path = f'{current_app.config['STATIC_PATH']}{filename}{file_ext}' # static path to write in database
+                    file_variants = save_image_variants(file, current_app.config['UPLOAD_PATH'], current_app.config['STATIC_PATH'], filename, file_ext)
+                    image = Image(post=post, thumbnail_path=file_variants['thumbnail'],
+                                original_path=db_orig_path, user_id=current_user.id ) # automatically sets post_id
+                    db.session.add(image)
+        db.session.commit()
+        board = db.session.scalar(sa.select(Board).where(Board.id == board_id))
+        if form.image.data == [] and form.post.data == '':
+            return redirect(url_for('main.board_posts', board_name=board.name))
+        flash(_('Your reply is published!'))
+        return redirect(url_for('main.board_posts', board_name=board.name))
+    return render_template('reply.html', title='Reply', form=form, recipient=post_author)
+
+
+@bp.route('/avatar_upload', methods=['GET', 'POST'])
+@login_required
+def avatar_upload():
+    form = AvatarUploadForm()
+    if form.validate_on_submit():
+        if form.avatar.data:
+            file = form.avatar.data
+            if file_exist(file.stream) == 'Ok':
+                given_filename = secure_filename(file.filename) # ensures the uploaded file's name is safe for the system
+                file_ext = os.path.splitext(given_filename)[1] # takes the file's extension
+                if file_ext == '':
+                    file_ext = '.' + os.path.splitext(given_filename)[0]
+
+                avatar_to_delete = Avatar.query.filter_by(user_id=current_user.id).first()
+                if avatar_to_delete:
+                    thumb_delete_path = os.path.join(current_app.config['AVATAR_DELETE_PATH'], avatar_to_delete.thumbnail_path)
+                    orig_delete_path = os.path.join(current_app.config['AVATAR_DELETE_PATH'],
+                                                     avatar_to_delete.original_path)
+                    os.remove(thumb_delete_path)
+                    os.remove(orig_delete_path)
+                    db.session.delete(avatar_to_delete)
+                    db.session.flush()
+                filename = str(uuid.uuid4()) # assigns a unique name for a file
+                orig_path = os.path.join(current_app.config['AVATAR_UPLOAD_PATH'], f'{filename}{file_ext}')
+                file.save(orig_path)
+                db_orig_path = f'{current_app.config['AVATAR_STATIC_PATH']}{filename}{file_ext}' # static path to write in database
+                file_variants = save_image_variants(file, current_app.config['AVATAR_UPLOAD_PATH'], current_app.config['AVATAR_STATIC_PATH'], filename, file_ext)
+                avatar = Avatar(user_id=current_user.id, thumbnail_path=file_variants['thumbnail'],
+                                original_path=db_orig_path)
+                db.session.add(avatar)
+                db.session.commit()
+                flash(_('Your avatar has been updated!'))
+                return redirect(url_for('main.user', username=current_user.username))
+    else:
+        return render_template('avatar_upload.html', title='Avatar Upload', form=form)
+

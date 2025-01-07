@@ -1,25 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-<header>
-    <div id="header-container">
-    </div>
-  </header>
     <div class="grid-container">
         <div class="container_welcome">
+            <div class="welcome_text">
             {% if current_user.is_authenticated %}
-                <div class="welcome_text">{{ _('Hello, %(username)s', username=current_user.username.capitalize()) }}!</div>
+                {{ _('Hello, %(username)s', username=current_user.username.capitalize()) }}!
             {% else %}
-                <div class="welcome_text">{{ _('Hello') }}!</div>
+                {{ _('Hello and welcome to the forum!') }}
             {% endif %}
-            <h2>{{ _('Choose your boards') }}</h2>
-        </div>
+                {{ _('Choose your boards!') }}
+            </div>
         <section class="boards">
-            <div class="board one"><a class="links" aria-current="page" href="{{ url_for('auth.login') }}"><img src="{{ url_for('static', filename='conversation-svgrepo-com.svg')}}"><p>{{ _('Casual') }}</p></a></div>
-            <div class="board two"><a class="links" aria-current="page" href="{{ url_for('auth.login') }}"><img src="{{ url_for('static', filename='cinema-svgrepo-com.svg')}}"><p>{{ _('Movies') }}</p></a></div>
-            <div class="board three"><a class="links" aria-current="page" href="{{ url_for('auth.login') }}"><img src="{{ url_for('static', filename='music-svgrepo-com.svg')}}"><p>{{ _('Music') }}</p></a></div>
-            <div class="board four"><a class="links" aria-current="page" href="{{ url_for('auth.login') }}"><img src="{{ url_for('static', filename='arcade-svgrepo-com.svg')}}"><p>{{ _('Video Games') }}</p></a></div>
-            <div class="board five"><a class="links" aria-current="page" href="{{ url_for('auth.login') }}"><img src="{{ url_for('static', filename='books-study-svgrepo-com.svg')}}"><p>{{ _('Books') }}</p></a></div>
+            <div class="board one"><a class="links" aria-current="page" href="{{ url_for('main.board_posts', board_name='Casual') }}"><img src="{{ url_for('static', filename='conversation-svgrepo-com.svg')}}"><p>{{ _('Casual') }}</p></a></div>
+            <div class="board two"><a class="links" aria-current="page" href="{{ url_for('main.board_posts', board_name='Movies') }}"><img src="{{ url_for('static', filename='cinema-svgrepo-com.svg')}}"><p>{{ _('Movies') }}</p></a></div>
+            <div class="board three"><a class="links" aria-current="page" href="{{ url_for('main.board_posts', board_name='Music') }}"><img src="{{ url_for('static', filename='music-svgrepo-com.svg')}}"><p>{{ _('Music') }}</p></a></div>
+            <div class="board four"><a class="links" aria-current="page" href="{{ url_for('main.board_posts', board_name='Video Games') }}"><img src="{{ url_for('static', filename='arcade-svgrepo-com.svg')}}"><p>{{ _('Video Games') }}</p></a></div>
+            <div class="board five"><a class="links" aria-current="page" href="{{ url_for('main.board_posts', board_name='Books') }}"><img src="{{ url_for('static', filename='books-study-svgrepo-com.svg')}}"><p>{{ _('Books') }}</p></a></div>
         </section>
     </div>
 

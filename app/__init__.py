@@ -47,6 +47,13 @@ def create_app(config_class=Config):
 
     from app.cli import bp as cli_bp
     app.register_blueprint(cli_bp)
+
+    with app.app_context():
+        boards = ["Casual", "Movies", "Music", "Video Games", "Books"]
+        for board in boards:
+            if not Board.query.filter_by(name=board).first():
+                db.session.add(Board(name=board))
+        db.session.commit()
     # creates a SMTPHandler instance, sets its level so that it only reports errors and not warnings,
     # informational or debugging messages, and attaches it to the app.logger object from Flask
     if not app.debug and not app.testing:
@@ -82,3 +89,4 @@ def create_app(config_class=Config):
     return app
 
 from app import models # reference to the app package
+from app.models import Board

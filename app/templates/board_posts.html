@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if current_user.is_authenticated %}
+        <h1>{{ _('Hi, %(username)s!', username=current_user.username) }}</h1>
+    <form action="" method="post" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.post.label }}<br>
+            {{ form.post(cols=32, rows=4) }}<br>
+            {{ form.image.label }}
+            {{ form.image }}
+            {% for error in form.post.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+    {% else %}
+        <h1>{{ _('Hi, anonymous!') }}</h1>
+        <h3>{{ _('If you want to post something or reply, please') }}
+            <a class="links" aria-current="page" href="{{ url_for('auth.login') }}">{{ _('log in') }}</a>
+        </h3>
+    {% endif %}
+<section class="board-links">
+            <div class=""><a class="forum-links" aria-current="page" href="{{ url_for('main.board_posts', board_name='Casual') }}"><img src="{{ url_for('static', filename='conversation-svgrepo-com.svg')}}"><span>{{ _('Casual') }}</span></a></div>
+    <div class=""><a class="forum-links" aria-current="page" href="{{ url_for('main.board_posts', board_name='Movies') }}"><img src="{{ url_for('static', filename='cinema-svgrepo-com.svg')}}"><span>{{ _('Movies') }}</span></a></div>
+            <div class=""><a class="forum-links" aria-current="page" href="{{ url_for('main.board_posts', board_name='Music') }}"><img src="{{ url_for('static', filename='music-svgrepo-com.svg')}}"><span>{{ _('Music') }}</span></a></div>
+            <div class=""><a class="forum-links" aria-current="page" href="{{ url_for('main.board_posts', board_name='Video Games') }}"><img src="{{ url_for('static', filename='arcade-svgrepo-com.svg')}}"><span>{{ _('Video Games') }}</span></a></div>
+            <div class=""><a class="forum-links" aria-current="page" href="{{ url_for('main.board_posts', board_name='Books') }}"><img src="{{ url_for('static', filename='books-study-svgrepo-com.svg')}}"><span>{{ _('Books') }}</span></a></div>
+</section>
+    <h2>{{ _('Board Posts') }}</h2>
+    {% for post in posts %}
+        {% include '_post.html' %}
+    {% endfor %}
+    {% if prev_url %}
+    <a href="{{ prev_url }}">{{ _('Newer posts') }}</a>
+    {% endif %}
+    {% if next_url %}
+    <a href="{{ next_url }}">{{ _('Older posts') }}</a>
+    {% endif %}
+
+{% endblock %}

@@ -8,7 +8,6 @@
     {% else %}
     <title>{{ _('Welcome to MyBubble') }}</title>
     {% endif %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='view.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -16,7 +15,6 @@
         <a class="logo" href="{{ url_for('main.index') }}">MyBubble</a>
         <nav class="nav">
             <a class="links" aria-current="page" href="{{ url_for('main.index') }}">{{ _('Home') }}</a>
-            <a class="links" aria-current="page" href="{{ url_for('main.forum') }}">{{ _('Forum') }}</a>
             {% if current_user.is_authenticated %}
                 <a class="links" aria-current="page" href="{{ url_for('main.messages') }}">{{ _('Messages') }}
                     {% set unread_message_count = current_user.unread_message_count() %}
@@ -77,47 +75,10 @@
         document.getElementById(destElem).innerText = data.text;
       }
 
-      function initialize_popovers() {
-        const popups = document.getElementsByClassName('user_popup');
-        for (let i = 0; i < popups.length; i++) {
-          const popover = new bootstrap.Popover(popups[i], {
-            content: 'Loading...',
-            trigger: 'hover focus',
-            placement: 'right',
-            html: true,
-            sanitize: false,
-            delay: {show: 500, hide: 0},
-            container: popups[i],
-            customClass: 'd-inline',
-          });
-          popups[i].addEventListener('show.bs.popover', async (ev) => {
-            if (ev.target.popupLoaded) {
-              return;
-            }
-            const response = await fetch('/user/' + ev.target.innerText.trim() + '/popup');
-            const data = await response.text();
-            const popover = bootstrap.Popover.getInstance(ev.target);
-            if (popover && data) {
-              ev.target.popupLoaded = true;
-              popover.setContent({'.popover-body': data});
-              flask_moment_render_all();
-            }
-          });
-        }
-      }
-      document.addEventListener('DOMContentLoaded', initialize_popovers);
-
       function set_message_count(n) {
         const count = document.getElementById('message_count');
         count.innerText = n;
         count.style.visibility = n ? 'visible' : 'hidden';
-      }
-
-      function set_task_progress(task_id, progress) {
-        const progressElement = document.getElementById(task_id + '-progress');
-        if (progressElement) {
-          progressElement.innerText = progress;
-        }
       }
 
       {% if current_user.is_authenticated %}

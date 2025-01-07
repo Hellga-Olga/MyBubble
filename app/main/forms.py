@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, MultipleFileField
 from wtforms import StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError, Length
 import sqlalchemy as sa
@@ -29,11 +30,15 @@ class EditProfileForm(FlaskForm):
                 raise ValidationError(_('Please use a different username'))
 
 class PostForm(FlaskForm):
-    post = TextAreaField(_l('Write something'), validators=[
-        DataRequired(), Length(min=1, max=140)])
+    post = TextAreaField(_l('Write something'), validators=[Length(min=0, max=140)])
+    image = MultipleFileField(_l('Upload images'))
     submit = SubmitField(_l('Submit'))
 
 class MessageForm(FlaskForm):
     message = TextAreaField(_l('Message'), validators=[
         DataRequired(), Length(min=0, max=140)])
+    submit = SubmitField(_l('Submit'))
+
+class AvatarUploadForm(FlaskForm):
+    avatar = FileField(_l('Upload your avatar'))
     submit = SubmitField(_l('Submit'))

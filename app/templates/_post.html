@@ -11,15 +11,67 @@
                         {{ post.author.username }}
                     </a>
                 {% endset %}
-                {{ _('%(username)s said %(when)s', username=user_link, when=moment(post.timestamp).fromNow()) }}: <b>
+                {% if post.parent_post %}
+                    {% set said = "replied" %}
+                {% else %}
+                    {% set said = "said" %}
+                {% endif %}
+                {{ _('%(username)s %(said)s %(when)s', username=user_link, said=said, when=moment(post.timestamp).fromNow()) }}:
+                {% if post.parent_post %}
+                <div class="parent-post-link {{ post.parent_post }}"><a class="post-link" href="#post{{ post.parent_post }}">@ {{ post.parent(id=post.parent_post).author.username }}: {{ post.parent(id=post.parent_post).body }}</a></div>
+                {% endif %} <b>
                 <span id="post{{ post.id }}">{{ post.body }}</span></b>
                 {% if post.language and post.language != g.locale %}
                 <br><br>
                 <span id="translation{{ post.id }}">
-                    <a href="javascript:translate('post{{ post.id }}', translation{{ post.id }},
+                    <a href="javascript:translate('post{{ post.id }}', 'translation{{ post.id }}',
                                                   '{{ post.language }}', '{{ g.locale }}');">{{ _('Translate') }}</a>
                 </span>
                 {% endif %}
+                {% if post.images %}
+                    <a href="javascript:popup('{{ post.id }}')"><div id="image-container-{{ post.id }}" class="image-container">
+                    {% for image in post.images %}
+                        <img src="{{ url_for('static', filename=image.thumbnail_path) }}" class="thumbnail" alt="Thumbnail Image">
+                    {% endfor %}
+                    </div>
+                    </a>
+                    <div id="popup-container-{{ post.id }}" class="popup-container" style="display: none;">
+                        <span id="popup-close-{{ post.id }}" class="popup-close">&times;</span>
+                        <div class="popup-content">
+                        {% for image in post.images %}
+                            <img src="{{ url_for('static', filename=image.original_path) }}" class="popup-image" alt="Full Size Image">
+                        {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+                <a href="{{ url_for('main.reply', post_id=post.id, post_author=post.author.username, board_id=post.board_id) }}">
+                    {{ _('Reply') }}
+                </a>
             </td>
         </tr>
     </table>
+
+    <script>
+
+        function popup(postId) {
+            const imageContainer = document.getElementById(`image-container-${postId}`);
+            const popupContainer = document.getElementById(`popup-container-${postId}`);
+            const popupImage = document.getElementsByClassName("popup-image");
+            const closeBtn = document.getElementById(`popup-close-${postId}`);
+
+            popupContainer.style.display = "flex";
+
+            // Close the popup when the close button is clicked
+            closeBtn.addEventListener("click", () => {
+                popupContainer.style.display = "none";
+                });
+
+            // Close the popup when clicking outside the popup content
+            popupContainer.addEventListener("click", (event) => {
+                if (event.target === popupContainer) {
+                popupContainer.style.display = "none";
+                }
+            });
+        }
+
+    </script>

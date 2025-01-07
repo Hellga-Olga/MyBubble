@@ -43,8 +43,37 @@ html, body {
 }
 
 .main-container {
-    padding: 20px 50px;
+    padding: 0px 50px;
     height: 83%;
+}
+
+.container_welcome {
+    animation-name: example1;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+}
+
+.welcome_text {
+    font-family: 'Roboto', sans-serif;
+    font-size: x-large;
+    font-weight: bold;
+    color: #154314;
+    position: relative;
+    width: fit-content;
+    animation-name: example;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes example1 {
+    from   {background-color:red;}
+    to  {background-color:yellow;}
+}
+
+@keyframes example {
+    from   {left:0%;}
+    to  {left:35%;}
+    -webkit-transform:translate3d(-35%,0,0);
 }
 
 .boards {
@@ -53,9 +82,19 @@ html, body {
     flex-wrap: nowrap;
 }
 
+.board {
+    width: 240px;
+    height: 240px;
+    text-align: center;
+
+}
+
 .links > img {
+    display: block;
     width: 200px;
     height: 200px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .one {
@@ -78,10 +117,69 @@ html, body {
     background-color: orange;
 }
 
+.forum-links > img {
+    width: 25px;
+}
+
+.parent-post-link {
+    background-color: yellow;
+    margin-left: 10px;
+}
+
+.post-link {
+ text-decoration: none;
+}
+
+/* Style for the popup overlay */
+.popup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: row;
+    wrap: nowrap;
+    /*justify-content: center;*/
+    /*align-items: center;*/
+    z-index: 1000;
+}
+
+/* Content inside the popup */
+.popup-content {
+    position: relative;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 90%;
+    max-height: 90%;
+    overflow: auto;
+    text-align: center;
+}
+
+/* Image in the popup */
+.popup-content img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 8px;
+}
+
+/* Close button */
+.popup-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: xx-large;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+}
+
 footer {
-display: flex;
-flex-direction: row;
-justify-content: space-around;
-flex-wrap: wrap;
-background: #593b61;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    background: #593b61;
 }
