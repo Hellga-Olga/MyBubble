@@ -64,7 +64,7 @@ def board_posts(board_name):
                     filename = str(uuid.uuid4())  # assigns a unique name for a file
                     orig_path = os.path.join(current_app.config['UPLOAD_PATH'], f'{filename}{file_ext}')
                     file.save(orig_path)
-                    db_orig_path = f'{current_app.config['STATIC_PATH']}{filename}{file_ext}'  # static path to write in database
+                    db_orig_path = f'{current_app.config["STATIC_PATH"]}{filename}{file_ext}'  # static path to write in database
                     file_variants = save_image_variants(file, current_app.config['UPLOAD_PATH'], current_app.config['STATIC_PATH'], filename, file_ext)
                     image = Image(post=post, thumbnail_path=file_variants['thumbnail'],
                                   original_path=db_orig_path, user_id=current_user.id)  # automatically sets post_id
@@ -260,7 +260,7 @@ def reply(board_id, post_id, post_author):
                     filename = str(uuid.uuid4()) # assigns a unique name for a file
                     orig_path = os.path.join(current_app.config['UPLOAD_PATH'], f'{filename}{file_ext}')
                     file.save(orig_path)
-                    db_orig_path = f'{current_app.config['STATIC_PATH']}{filename}{file_ext}' # static path to write in database
+                    db_orig_path = f'{current_app.config["STATIC_PATH"]}{filename}{file_ext}' # static path to write in database
                     file_variants = save_image_variants(file, current_app.config['UPLOAD_PATH'], current_app.config['STATIC_PATH'], filename, file_ext)
                     image = Image(post=post, thumbnail_path=file_variants['thumbnail'],
                                 original_path=db_orig_path, user_id=current_user.id ) # automatically sets post_id
@@ -299,7 +299,7 @@ def avatar_upload():
                 filename = str(uuid.uuid4()) # assigns a unique name for a file
                 orig_path = os.path.join(current_app.config['AVATAR_UPLOAD_PATH'], f'{filename}{file_ext}')
                 file.save(orig_path)
-                db_orig_path = f'{current_app.config['AVATAR_STATIC_PATH']}{filename}{file_ext}' # static path to write in database
+                db_orig_path = f'{current_app.config["AVATAR_STATIC_PATH"]}{filename}{file_ext}' # static path to write in database
                 file_variants = save_image_variants(file, current_app.config['AVATAR_UPLOAD_PATH'], current_app.config['AVATAR_STATIC_PATH'], filename, file_ext)
                 avatar = Avatar(user_id=current_user.id, thumbnail_path=file_variants['thumbnail'],
                                 original_path=db_orig_path)
