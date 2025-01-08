@@ -48,6 +48,8 @@ def create_app(config_class=Config):
     from app.cli import bp as cli_bp
     app.register_blueprint(cli_bp)
 
+    db.create_all()
+
     with app.app_context():
         boards = ["Casual", "Movies", "Music", "Video Games", "Books"]
         for board in boards:
