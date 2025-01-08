@@ -186,8 +186,8 @@ class Notification(db.Model):
 class Image(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     post_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Post.id), index=True)
-    thumbnail_path: so.Mapped[str] = so.mapped_column(sa.String(50))
-    original_path: so.Mapped[str] = so.mapped_column(sa.String(50))
+    thumbnail_path: so.Mapped[str] = so.mapped_column(sa.String(255))
+    original_path: so.Mapped[str] = so.mapped_column(sa.String(255))
     user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id), index=True)
     post: so.Mapped['Post'] = so.relationship(back_populates='images')
     timestamp: so.Mapped[datetime] = so.mapped_column(index=True, default=lambda: datetime.now(timezone.utc))
@@ -198,8 +198,8 @@ class Image(db.Model):
 
 class Avatar(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    thumbnail_path: so.Mapped[str] = so.mapped_column(sa.String(50))
-    original_path: so.Mapped[str] = so.mapped_column(sa.String(50))
+    thumbnail_path: so.Mapped[str] = so.mapped_column(sa.String(255))
+    original_path: so.Mapped[str] = so.mapped_column(sa.String(255))
     user_id: so.Mapped[int] = so.mapped_column(db.ForeignKey(User.id))
     timestamp: so.Mapped[datetime] = so.mapped_column(index=True, default=lambda: datetime.now(timezone.utc))
 
