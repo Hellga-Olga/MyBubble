@@ -48,9 +48,9 @@ def create_app(config_class=Config):
     from app.cli import bp as cli_bp
     app.register_blueprint(cli_bp)
 
-    db.create_all()
-
     with app.app_context():
+        db.create_all()
+
         boards = ["Casual", "Movies", "Music", "Video Games", "Books"]
         for board in boards:
             if not Board.query.filter_by(name=board).first():
