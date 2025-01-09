@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>{{ _('Send Message to %(recipient)s', recipient=recipient) }}</h1>
     <form action="" method="post">
+        <div class="default-header-text">
+            {{ _('Send Message to %(recipient)s', recipient=recipient) }}
+        </div>
         {{ form.hidden_tag() }}
         <p>
             {{ form.message.label }}<br>

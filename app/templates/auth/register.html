@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>{{ _('Register') }}</h1>
+    
     <form action="" method="post">
+        <div class="default-header-text">
+            {{ _('Register') }}
+        </div>
         {{ form.hidden_tag() }}
         <p>
             {{ form.username.label }}<br>

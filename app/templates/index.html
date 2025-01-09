@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="grid-container">
         <div class="container_welcome">
             <div class="welcome_text">
             {% if current_user.is_authenticated %}
@@ -20,16 +19,18 @@
         </section>
     </div>
 
-<br>
-    <h2>{{ _('Latest on the forum') }}</h2>
+<div class="main-container">
+    <div class="default-posts-header">
+        {{ _('Latest on the forum') }}
+    </div>
     {% for post in posts %}
         {% include '_post.html' %}
     {% endfor %}
     {% if prev_url %}
-    <a href="{{ prev_url }}">{{ _('Newer posts') }}</a>
+    <a class="post-link" href="{{ prev_url }}">{{ _('Newer posts') }}</a>
     {% endif %}
     {% if next_url %}
-    <a href="{{ next_url }}">{{ _('Older posts') }}</a>
+    <a class="post-link" href="{{ next_url }}">{{ _('Older posts') }}</a>
     {% endif %}
     </div>
 {% endblock %}

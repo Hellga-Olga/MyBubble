@@ -1,22 +1,27 @@
 {% extends "base.html" %}
-
+    
 {% block content %}
-    <h1>{{ _('Messages') }}</h1>
-    {% for post in messages %}
-        {% include '_post.html' %}
-    {% endfor %}
-    <nav aria-label="...">
-        <ul class="pager">
-            <li class="previous{% if not prev_url %} disabled{% endif %}">
-                <a href="{{ prev_url or '#' }}">
-                    <span aria-hidden="true">&larr;</span> {{ _('Newer messages') }}
-                </a>
-            </li>
-            <li class="next{% if not next_url %} disabled{% endif %}">
-                <a href="{{ next_url or '#' }}">
-                    {{ _('Older messages') }} <span aria-hidden="true">&rarr;</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+    <div class="main-container">
+        <div class="default-header-text">
+            {{ _('Your Messages') }}
+        </div>
+    
+        {% for post in messages %}
+            {% include '_post.html' %}
+        {% endfor %}
+        {% if prev_url %}
+        <a class="post-link" href="{{ prev_url }}">{{ _('Newer posts') }}</a>
+        {% endif %}
+        {% if next_url %}
+        <a class="post-link" href="{{ next_url }}">{{ _('Older posts') }}</a>
+        {% endif %}
+        <nav aria-label="...">
+            <a class="post-link" href="{{ prev_url or '#' }}">
+                {{ _('Newer messages') }}
+            </a>
+            <a class="post-link" href="{{ next_url or '#' }}">
+                {{ _('Older messages') }}
+            </a>
+        </nav>
+    </div>
 {% endblock %}
