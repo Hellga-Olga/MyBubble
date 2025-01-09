@@ -1,0 +1,554 @@
+@import url('https://fonts.googleapis.com/css2?family=Modak&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensures the body takes at least the full height of the viewport */
+    margin: 0; /* Remove default margin */
+    background-color: #fde3bc;
+    font-family:"Roboto", serif;
+}
+
+main {
+    flex: 1; /* Pushes the footer to the bottom if content is less than viewport height */
+}
+
+/* Navbar Styling */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    background-color: #f3b036;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.247);
+    position: relative;
+}
+
+/* Logo Styling */
+.logo {
+    font-family: "Modak", serif;
+    font-weight: 400;
+    font-style: normal;
+    color: #4e44a1;
+    text-shadow: 5px 5px 5px #d6d2f5;
+    font-size: 3rem;
+    text-decoration: none;
+}
+
+.logo:hover {
+    text-shadow: 5px 5px 5px #fbe4ff;
+}
+
+/* Navigation Links Container */
+.nav {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    transition: max-height 0.3s ease, visibility 0.3s ease;
+}
+
+/* Navigation Links Styling */
+.links {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.links:hover {
+    color: #0056b3;
+}
+
+/* Badge Styling */
+.badge {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.5rem;
+    color: #812d4f;
+    font-weight: bold;
+}
+
+/* Hamburger Button */
+.nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.hamburger {
+    width: 25px;
+    height: 3px;
+    background: #333;
+    display: block;
+    position: relative;
+}
+
+.hamburger::before,
+.hamburger::after {
+    content: '';
+    width: 25px;
+    height: 3px;
+    background: #333;
+    position: absolute;
+    left: 0;
+    transition: transform 0.3s ease;
+}
+
+.hamburger::before {
+    top: -8px;
+}
+
+.hamburger::after {
+    top: 8px;
+}
+
+.container_welcome {
+    display: grid;
+    grid-template-rows: auto 1fr; /* Two rows: one for welcome_text, one for boards */
+    width: 100%;
+    height: 100%;
+}
+
+/* Welcome Text Row */
+.welcome_text {
+    grid-row: 1; /* First row of the grid */
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 1rem;
+    background-color: #fde3bc;
+    color: #333;
+    width: 100%;
+}
+
+.default-header-text {
+    text-align:left;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.default-posts-header {
+    text-align:center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Boards Section */
+.boards {
+    grid-row: 2; /* Second row of the grid */
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    width: 100%;
+}
+
+/* Board Divs */
+.board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+}
+
+.one {
+    background-color: #d64161;
+}
+
+.two {
+    background-color: #8b81ea;
+}
+
+.three {
+    background-color: #5dbb67;
+}
+
+.four {
+    background-color: yellow;
+}
+
+.five {
+    background-color:#ff7b25;
+}
+
+.board img {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 0.5rem;
+}
+
+.board p {
+    margin: 0;
+    font-size: 1rem;
+    color: #495057;
+}
+
+/* Links Styling */
+.links {
+    text-decoration: none;
+    font-weight: bold;
+    color: black;
+    transition: transform 0.2s ease, color 0.3s ease;
+}
+
+.links:hover {
+    color: #007bff;
+    transform: scale(1.05); /* Slight zoom on hover */
+}
+
+#forum-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#form-post {
+    padding: 20px;
+    }
+
+.link-svg {
+    width: 25px;
+}
+
+/* Main Container */
+.main-container {
+    padding: 2rem;
+    max-width: 1200px; /* Center content and limit width */
+    margin: 1.5rem auto auto auto; /* Center the container horizontally */
+    background-color: #f3b036; /* Light background for distinction */
+}
+
+/* Heading */
+.main-container h2 {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* Post Table */
+table {
+    width: 100%; /* Full width for the table */
+    margin-bottom: 2rem; /* Space between posts */
+    border-collapse: separate; /* Prevents overlapping borders */
+    border-spacing: 1rem;
+    background-color: #ffefd7;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.247);
+    border-radius: 8px;
+    overflow: hidden; /* Clips content to the border radius */
+}
+
+/* Table Rows and Cells */
+table tr {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+table td {
+    padding: 1rem;
+    vertical-align: top;
+    flex: 1;
+}
+
+
+/* Post Author and Content */
+table td:nth-child(2) {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.5;
+}
+
+table td:nth-child(3) {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.5;
+    vertical-align: bottom;
+}
+
+/* Avatar Image */
+.post-avatar {
+    border-radius: 20%;
+    display: block;
+    height: 80px;
+    margin: 0.5rem;
+}
+
+/* Parent Post Link */
+.parent-post-link {
+    background-color: #ffe4bb;
+    border-left: 4px solid #4e44a1;
+    font-size: 0.9rem;
+    color: #74bdac;
+    display: inline-block;
+    margin: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Post Content */
+#post {
+    display: block;
+    margin-top: 1rem;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Links Styling */
+a {
+    text-decoration: none;
+    color: #007bff;
+    transition: color 0.2s ease-in-out;
+}
+
+/* Pagination Links */
+.post-link {
+    display: inline-block;
+    margin: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #4e44a1;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.post-link:hover {
+    background-color: #3679F3;
+}
+
+
+/* Popup Image Styling */
+.image-container {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.thumbnail {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: 4px;
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.thumbnail:hover {
+    transform: scale(1.05);
+}
+
+.popup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.popup-content {
+    max-width: 90%;
+    max-height: 90%;
+    overflow: auto;
+}
+
+.popup-image {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    margin-bottom: 1rem;
+}
+
+.popup-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 2rem;
+    color: #fff;
+    cursor: pointer;
+}
+
+.follow {
+    margin: 0.5rem;
+    padding: 0;
+    max-width:fit-content;
+    background-color: #4e44a1;
+}
+
+/* General form styling */
+form {
+    max-width: 500px;
+    margin: 10px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #ffefd7;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Label styling */
+form p {
+    margin-bottom: 5px;
+}
+
+label {
+    font-weight: bold;
+    color: #333;
+    display: block;
+}
+
+/* Input field styling */
+input[type="text"],
+input[type="password"],
+textarea {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* File input styling */
+input[type="file"] {
+    font-size: 14px;
+}
+
+/* Submit button styling */
+input[type="submit"], button {
+    background-color: #4e44a1;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+footer {
+    background-color: #302a64;
+    color: #ffffff;
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.9rem;
+}
+
+.footer-container p {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .nav {
+        flex-direction: column;
+        gap: 1rem;
+        max-height: 0; /* Hidden by default */
+        overflow: hidden;
+        visibility: hidden;
+    }
+
+    .nav.active {
+        max-height: 500px;
+        visibility: visible;
+    }
+
+    .nav-toggle {
+        display: block;
+    }
+
+    .hamburger.active {
+        background: transparent;
+    }
+
+    .hamburger.active::before {
+        transform: rotate(45deg) translateY(8px);
+    }
+
+    .hamburger.active::after {
+        transform: rotate(-45deg) translateY(-8px);
+    }
+
+    .link-svg {
+        width: 40px;
+    }
+
+    .adaptive-links {
+        display: none;
+    }
+
+    .boards {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on smaller screens */
+    }
+
+    .board {
+        padding: 1rem; /* Add padding for smaller screens */
+    }
+
+    table tr {
+        flex-direction: column;
+    }
+
+    table td {
+        flex: none;
+        width: 100%;
+    }
+
+}
+
+@media (max-width: 480px) {
+    .boards {
+        grid-template-columns: 1fr; /* Stack boards vertically on very small screens */
+    }
+
+    .link-svg {
+        width: 35px;
+    }
+
+    .adaptive-links {
+        display: none;
+    }
+
+    form {
+        padding: 15px;
+    }
+
+    input[type="text"],
+    textarea {
+        font-size: 14px;
+    }
+
+    input[type="submit"], button {
+        font-size: 14px;
+    }
+}
