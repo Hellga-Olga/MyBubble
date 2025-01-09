@@ -11,11 +11,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+  <header>
     <div class="navbar">
         <a class="logo" href="{{ url_for('main.index') }}">MyBubble</a>
+        <button class="nav-toggle" aria-label="Toggle Navigation">
+          <span class="hamburger"></span>
+        </button>
         <nav class="nav">
-            <a class="links" aria-current="page" href="{{ url_for('main.index') }}">{{ _('Home') }}</a>
             {% if current_user.is_authenticated %}
+                <a class="links" aria-current="page" href="{{ url_for('main.index') }}">{{ _('Home') }}</a>
                 <a class="links" aria-current="page" href="{{ url_for('main.messages') }}">{{ _('Messages') }}
                     {% set unread_message_count = current_user.unread_message_count() %}
                     <span id="message_count" class="badge text-bg-danger"
@@ -33,13 +37,10 @@
             {% endif %}
         </nav>
     </div>
+  </header>
 
-    <div class="main-container">
-        {% if current_user.is_authenticated %}
-
-        {% endif %}
-
-        {% with messages = get_flashed_messages() %}
+    <main>
+      {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
             <div class="alert alert-info" role="alert">{{ message }}</div>
@@ -48,7 +49,8 @@
         {% endwith %}
 
         {% block content %}{% endblock %}
-    </div>
+    </main>
+
     <footer>
       <div class="footer-container">
         <p>&copy; 2025 MyBubble by Olga Neiasova</p>
@@ -59,6 +61,13 @@
     {{ moment.include_moment() }}
     {{ moment.lang(g.locale) }}
     <script>
+      document.querySelector('.nav-toggle').addEventListener('click', function () {
+          const nav = document.querySelector('.nav');
+          const hamburger = document.querySelector('.hamburger');
+          nav.classList.toggle('active');
+          hamburger.classList.toggle('active');
+      });
+
       async function translate(sourceElem, destElem, sourceLang, destLang) {
         document.getElementById(destElem).innerHTML =
           '<img src="{{ url_for('static', filename='loading.gif') }}">';

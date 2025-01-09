@@ -2,12 +2,11 @@
         <tr valign="top">
             <td>
                 <a href="{{ url_for('main.user', username=post.author.username) }}">
-                    <img src="{{ post.author.avatar(36) }}">
+                    <img class="post-avatar" src="{{ post.author.avatar(120) }}">
                 </a>
-            </td>
-            <td>
+                <br>
                 {% set user_link %}
-                    <a href="{{ url_for('main.user', username=post.author.username) }}">
+                    <a class="post-link" href="{{ url_for('main.user', username=post.author.username) }}">
                         {{ post.author.username }}
                     </a>
                 {% endset %}
@@ -17,17 +16,13 @@
                     {% set said = "said" %}
                 {% endif %}
                 {{ _('%(username)s %(said)s %(when)s', username=user_link, said=said, when=moment(post.timestamp).fromNow()) }}:
+                </td>
+                <td>
                 {% if post.parent_post %}
-                <div class="parent-post-link {{ post.parent_post }}"><a class="post-link" href="#post{{ post.parent_post }}">@ {{ post.parent(id=post.parent_post).author.username }}: {{ post.parent(id=post.parent_post).body }}</a></div>
+                <div class="parent-post-link {{ post.parent_post }}"><a href="#post{{ post.parent_post }}">@ {{ post.parent(id=post.parent_post).author.username }}: {{ post.parent(id=post.parent_post).body }}</a></div>
                 {% endif %} <b>
-                <span id="post{{ post.id }}">{{ post.body }}</span></b>
-                {% if post.language and post.language != g.locale %}
-                <br><br>
-                <span id="translation{{ post.id }}">
-                    <a href="javascript:translate('post{{ post.id }}', 'translation{{ post.id }}',
-                                                  '{{ post.language }}', '{{ g.locale }}');">{{ _('Translate') }}</a>
-                </span>
-                {% endif %}
+                <div class="post-body" id="post{{ post.id }}">{{ post.body }}</div></b>
+                <div class="translation-body" id="translation{{ post.id }}"></div></b>
                 {% if post.images %}
                     <a href="javascript:popup('{{ post.id }}')"><div id="image-container-{{ post.id }}" class="image-container">
                     {% for image in post.images %}
@@ -44,7 +39,15 @@
                         </div>
                     </div>
                 {% endif %}
-                <a href="{{ url_for('main.reply', post_id=post.id, post_author=post.author.username, board_id=post.board_id) }}">
+            </td>
+            <td>
+                {% if post.language and post.language != g.locale %}
+                <span id="translation{{ post.id }}">
+                    <a class="post-link" href="javascript:translate('post{{ post.id }}', 'translation{{ post.id }}',
+                                                  '{{ post.language }}', '{{ g.locale }}');">{{ _('Translate') }}</a>
+                </span>
+                {% endif %}
+                <a class="post-link" href="{{ url_for('main.reply', post_id=post.id, post_author=post.author.username, board_id=post.board_id) }}">
                     {{ _('Reply') }}
                 </a>
             </td>
